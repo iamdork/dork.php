@@ -1,0 +1,65 @@
+- name: enable webtatic-release
+  shell: rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+  ignore_errors: True
+
+- name: install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+  - sendmail
+  - php56w
+  - php56w-fpm
+  - php56w-mysql
+  - php56w-gd
+  - php56w-mcrypt
+  - php56w-pecl-xdebug
+  - php56w-mbstring
+  - php56w-opcache
+
+- name: copy php configuration files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+  - src: php.ini
+    dest: /etc/php.d/dork.ini
+  - src: www.conf
+    dest: /etc/php-fpm.d/www.conf
+  - src: php-fpm.conf
+    dest: /etc/php-fpm.conf
+  - src: php.conf
+    dest: /etc/nginx/php.conf
+
+- name: override nginx vhost
+  copy:
+    src: dork.conf
+    dest: /etc/nginx/conf.d/dork.conf
+
+- name: composer directory
+  file:
+    path: /usr/local/composer
+    state: directory
+
+- name: download composer
+  shell: curl -sS http://getcomposer.org/installer | php
+  args:
+    chdir: /usr/local/composer
+    creates: /usr/local/composer/composer.phar
+
+- name: link composer into path
+  file:
+    src: /usr/local/composer/composer.phar
+    dest: /usr/local/bin/composer
+    state: link
+
+- name: add composer bin to paths
+  lineinfile:
+    line: PATH=/usr/local/composer/vendor/bin:$PATH
+    dest: "{{ item }}"
+  with_items:
+  - /root/.zshrc
+  - /home/{{ dork_user }}/.zshrc

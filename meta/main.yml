@@ -1,0 +1,8 @@
+---
+dependencies:
+- dork.nginx
+- { role: dork.supervisord, service_name: php-fpm, service_command: /usr/sbin/php-fpm --nodaemonize }
+
+dork:
+  matches:
+  - '**.php'
