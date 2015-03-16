@@ -1,6 +1,7 @@
 - name: enable webtatic-release
-  shell: rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
-  ignore_errors: True
+  yum:
+    name: https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+    state: present
 
 - name: install packages
   yum:
