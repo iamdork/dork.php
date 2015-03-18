@@ -9,14 +9,15 @@
     state: present
   with_items:
   - sendmail
-  - php56w
-  - php56w-fpm
-  - php56w-mysql
-  - php56w-gd
-  - php56w-mcrypt
-  - php56w-pecl-xdebug
-  - php56w-mbstring
-  - php56w-opcache
+  - php{{ php_version }}w
+  - php{{ php_version }}w-fpm
+  - php{{ php_version }}w-mysql
+  - php{{ php_version }}w-gd
+  - php{{ php_version }}w-mcrypt
+  - php{{ php_version }}w-pecl-xdebug
+  - php{{ php_version }}w-mbstring
+  - php{{ php_version }}w-opcache
+  - php{{ php_version }}w-xml
 
 - name: copy php configuration files
   copy:
