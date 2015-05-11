@@ -65,3 +65,9 @@
   with_items:
   - /root/.zshrc
   - /home/{{ dork_user }}/.zshrc
+
+- name: supervisor configuration
+  copy:
+    src: php-fpm.ini
+    dest: /etc/supervisord.d/php-fpm.ini
+  notify: reload supervisor
