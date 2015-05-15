@@ -58,16 +58,14 @@
     dest: /usr/local/bin/composer
     state: link
 
-- name: add composer bin to paths
-  lineinfile:
-    line: PATH=/usr/local/composer/vendor/bin:$PATH
-    dest: "{{ item }}"
-  with_items:
-  - /root/.zshrc
-  - /home/{{ dork_user }}/.zshrc
-
 - name: supervisor configuration
   copy:
     src: php-fpm.ini
     dest: /etc/supervisord.d/php-fpm.ini
-  notify: reload supervisor
+  register: supervisor
+
+- name: reload supervisor
+  supervisorctl:
+    name: php-fpm
+    state: restarted
+  when: supervisor.changed
