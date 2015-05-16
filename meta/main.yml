@@ -2,5 +2,5 @@ dependencies:
 - dork.nginx
 
 dork:
-  matches:
+  build_triggers:
   - '**.php'
