@@ -64,6 +64,11 @@
     dest: /etc/supervisord.d/php-fpm.ini
   register: supervisor
 
+- name: start php-fpm
+  supervisorctl:
+    name: php-fpm
+    state: started
+
 - name: reload supervisor
   supervisorctl:
     name: php-fpm
