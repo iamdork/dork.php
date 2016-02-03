@@ -1,23 +1,42 @@
-- name: enable webtatic-release
+- name: enable remi repository
   yum:
-    name: https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+    name: http://rpms.remirepo.net/enterprise/remi-release-7.rpm
     state: present
 
 - name: install packages
   yum:
     name: "{{ item }}"
     state: present
+    enablerepo: remi, remi-php{{ php_version }}
   with_items:
-  - sendmail
-  - php{{ php_version }}w
-  - php{{ php_version }}w-fpm
-  - php{{ php_version }}w-mysql
-  - php{{ php_version }}w-gd
-  - php{{ php_version }}w-mcrypt
-  - php{{ php_version }}w-pecl-xdebug
-  - php{{ php_version }}w-mbstring
-  - php{{ php_version }}w-opcache
-  - php{{ php_version }}w-xml
+  - nginx
+  - php
+  - php-fpm
+  - php-mysql
+  - php-gd
+  - php-mcrypt
+  - php-mbstring
+  - php-opcache
+  - php-xml
+
+- name: install development packages
+  yum:
+    name: "{{ item }}"
+    state: present
+    enablerepo: remi, remi-php{{ php_version }}
+  with_items:
+  - php-pecl-xdebug
+  when: dork_development is defined
+
+- name: create php directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+  - /etc/php-fpm.d/
+  - /etc/php.d/
+  - /var/log/php-fpm
+  - /var/run/php-fpm
 
 - name: copy php configuration files
   copy:
@@ -31,15 +50,23 @@
     dest: /etc/php.d/dork.ini
   - src: www.conf
     dest: /etc/php-fpm.d/www.conf
-  - src: php-fpm.conf
-    dest: /etc/php-fpm.conf
   - src: php.conf
     dest: /etc/nginx/php.conf
+  notify: dork.php reload
 
-- name: override nginx vhost
-  copy:
-    src: dork.conf
-    dest: /etc/nginx/conf.d/dork.conf
+- name: enable nginx vhost
+  template:
+    src: php.conf.j2
+    dest: /etc/nginx/conf.d/php.conf
+  when: php_http_port
+  notify: dork.nginx reload
+
+- name: remove nginx vhost
+  file:
+    path: /etc/nginx/conf.d/php.conf
+    state: absent
+  when: not php_http_port
+  notify: dork.nginx reload
 
 - name: composer directory
   file:
@@ -68,9 +95,3 @@
   supervisorctl:
     name: php-fpm
     state: started
-
-- name: reload supervisor
-  supervisorctl:
-    name: php-fpm
-    state: restarted
-  when: supervisor.changed

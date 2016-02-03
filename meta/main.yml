@@ -1,5 +1,8 @@
 dependencies:
-- dork.nginx
+- dork.sendmail
+- { role: dork.nginx,
+    # Disable the default static file handler.
+    nginx_http_port: False }
 
 dork:
   build_triggers:

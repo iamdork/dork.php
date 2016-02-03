@@ -1,0 +1,4 @@
+- name: dork.php reload
+  supervisorctl:
+    name: php-fpm
+    state: restarted
