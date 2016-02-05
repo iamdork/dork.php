@@ -4,6 +4,3 @@ dependencies:
     # Disable the default static file handler.
     nginx_http_port: False }
 
-dork:
-  build_triggers:
-  - '**.php'

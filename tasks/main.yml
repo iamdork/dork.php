@@ -7,7 +7,7 @@
   yum:
     name: "{{ item }}"
     state: present
-    enablerepo: remi, remi-php{{ php_version }}
+    enablerepo: remi,remi-php{{ php_version }}
   with_items:
   - nginx
   - php
@@ -23,7 +23,7 @@
   yum:
     name: "{{ item }}"
     state: present
-    enablerepo: remi, remi-php{{ php_version }}
+    enablerepo: remi,remi-php{{ php_version }}
   with_items:
   - php-pecl-xdebug
   when: dork_development is defined
@@ -94,4 +94,4 @@
 - name: start php-fpm
   supervisorctl:
     name: php-fpm
-    state: started
+    state: present
