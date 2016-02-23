@@ -1,2 +1,2 @@
-php_version: 70
-php_http_port: 8090
+php_version: 56
+php_github_token: False

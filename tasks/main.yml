@@ -38,34 +38,32 @@
   - /var/log/php-fpm
   - /var/run/php-fpm
 
-- name: copy php configuration files
-  copy:
+- name: generate php configuration files
+  template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: root
     group: root
     mode: 0644
   with_items:
-  - src: php.ini
+  - src: php.ini.j2
     dest: /etc/php.d/dork.ini
-  - src: www.conf
+  - src: www.conf.j2
     dest: /etc/php-fpm.d/www.conf
-  - src: php.conf
-    dest: /etc/nginx/php.conf
   notify: dork.php reload
 
-- name: enable nginx vhost
+- name: generate php configuration files
   template:
-    src: php.conf.j2
-    dest: /etc/nginx/conf.d/php.conf
-  when: php_http_port
-  notify: dork.nginx reload
-
-- name: remove nginx vhost
-  file:
-    path: /etc/nginx/conf.d/php.conf
-    state: absent
-  when: not php_http_port
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+  - src: php.fastcgi.conf.j2
+    dest: /etc/nginx/php.conf
+  - src: php.server.conf.j2
+    dest: /etc/nginx/conf.d/default.conf
   notify: dork.nginx reload
 
 - name: composer directory
@@ -84,6 +82,9 @@
     src: /usr/local/composer/composer.phar
     dest: /usr/local/bin/composer
     state: link
+
+- name: add composer oauth token
+  shell: composer config -g github-oauth.github.com {{ php_github_token }}
 
 - name: supervisor configuration
   copy:

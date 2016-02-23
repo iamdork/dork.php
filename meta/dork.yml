@@ -1,2 +1,6 @@
 build_triggers:
 - '**.php'
+
+services:
+  php-fpm: 9000
+  xdebug: 9001

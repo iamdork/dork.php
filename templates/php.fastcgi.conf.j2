@@ -1,4 +1,4 @@
-fastcgi_pass 127.0.0.1:9000;
+fastcgi_pass 127.0.0.1:{{ dork_ports['php-fpm'] }};
 fastcgi_index index.php;
 include fastcgi.conf;
 
